@@ -7,8 +7,6 @@ end
 
 """Describes how to construct time_series from raw time series data files."""
 mutable struct TimeSeriesFileMetadata
-    "User description of simulation"
-    simulation::String
     "String version of abstract type for the component associated with the time series."
     category::String
     "Calling module should determine the actual type."
@@ -36,7 +34,6 @@ mutable struct TimeSeriesFileMetadata
 end
 
 function TimeSeriesFileMetadata(;
-    simulation,
     category,
     component_name,
     name,
@@ -50,7 +47,6 @@ function TimeSeriesFileMetadata(;
     scaling_factor_multiplier_module = nothing,
 )
     return TimeSeriesFileMetadata(
-        simulation,
         category,
         component_name,
         name,
@@ -84,7 +80,6 @@ function read_time_series_file_metadata(file_path::AbstractString)
                 push!(
                     metadata,
                     TimeSeriesFileMetadata(;
-                        simulation = item["simulation"],
                         category = item["category"],
                         component_name = item["component_name"],
                         name = item["name"],
@@ -117,7 +112,6 @@ function read_time_series_file_metadata(file_path::AbstractString)
             push!(
                 metadata,
                 TimeSeriesFileMetadata(;
-                    simulation = row.simulation,
                     category = row.category,
                     component_name = row.component_name,
                     name = row.name,
@@ -183,7 +177,6 @@ function handle_normalization_factor(
 end
 
 struct TimeSeriesParsedInfo
-    simulation::String
     component::InfrastructureSystemsComponent
     name::String  # Component field on which time series data is based.
     normalization_factor::NormalizationFactor
@@ -194,7 +187,6 @@ struct TimeSeriesParsedInfo
     scaling_factor_multiplier::Union{Nothing, Function}
 
     function TimeSeriesParsedInfo(
-        simulation,
         component,
         name,
         normalization_factor,
@@ -205,7 +197,6 @@ struct TimeSeriesParsedInfo
         scaling_factor_multiplier = nothing,
     )
         return new(
-            simulation,
             component,
             name,
             normalization_factor,
@@ -256,7 +247,6 @@ function TimeSeriesParsedInfo(metadata::TimeSeriesFileMetadata, raw_data::RawTim
     end
 
     return TimeSeriesParsedInfo(
-        metadata.simulation,
         metadata.component,
         metadata.name,
         normalization_factor,
